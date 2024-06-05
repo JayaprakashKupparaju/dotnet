@@ -42,7 +42,7 @@ steps:
 
 - task: AzureWebApp@1
   inputs:
-    azureSubscription: '570a2153-6081-4b16-9126-8c04e86eb99b'
+    azureSubscription: 'dotnetazureappconnection'
     appName: 'dotnetappgit'
     package: '$(Build.ArtifactStagingDirectory)/*.zip'
   displayName: 'Deploy to Azure Web App'
