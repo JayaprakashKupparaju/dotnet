@@ -1,0 +1,48 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '5.x'
+  displayName: 'Install .NET SDK'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
+  displayName: 'Restore NuGet packages'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+  displayName: 'Build the project'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+  displayName: 'Publish the project'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'drop'
+  displayName: 'Publish build artifacts'
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: '570a2153-6081-4b16-9126-8c04e86eb99b'
+    appName: 'dotnetappgit'
+    package: '$(Build.ArtifactStagingDirectory)/*.zip'
+  displayName: 'Deploy to Azure Web App'
